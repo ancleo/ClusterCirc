@@ -34,7 +34,7 @@ cc_simu <- function(n) {
     h_sq <- for_cc_simu[4]
     h <- sqrt(rep(h_sq, m))
     c_wrange <- rep(for_cc_simu[5], p)
-    n_simu <- 2
+    n_simu <- 500
     n_pop <- n_simu * n
     mf <- m + 2
     # mf = Number of latent variables (m +2 circumplex factors)
