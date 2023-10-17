@@ -37,10 +37,10 @@ The description, vignette, and function documentation can be seen by
 
 ## Downloading source code:
 
-If your are interested in the source code of the ClusterCirc functions,
+If you are interested in the source code of the ClusterCirc functions,
 please download the current release of this repository. It contains all
-files of the R package. Source code of the ClusterCirc functions can be
-found in the subfolder "R".
+files of the R package (Releases in the right-hand corner of this github website). 
+Source code of the ClusterCirc functions can be found in the subfolder "R".
 
 ## Using and citing ClusterCirc:
 
