@@ -44,7 +44,7 @@ found in the subfolder "R".
 
 ## Using and citing ClusterCirc:
 
-The manuscript that presents Cluster-Circ has been submitted to a peer- 
+The manuscript that presents Cluster-Circ has been submitted to a peer-
 reviewed journal. When using Cluster-Circ, please cite the preprint version 
 at the current stage of the publication process: 
 
