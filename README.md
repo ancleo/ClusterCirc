@@ -5,10 +5,10 @@ item clusters with optimal circumplex spacing in your data.
 # Installing ClusterCirc in R:
 Type the following commands in the R console to install and load ClusterCirc:
 
-install.packages("devtools")
-library(devtools)
-install_github("anweide/ClusterCirc") 
-library(ClusterCirc)
+install.packages("devtools")  
+library(devtools)  
+install_github("anweide/ClusterCirc")  
+library(ClusterCirc)  
 
 ClusterCirc depends on two external R packages: psych and knitr. If the
 dependencies are not installed automatically, you can try the following:
