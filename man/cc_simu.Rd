@@ -25,5 +25,5 @@ Performs Cluster-Circ on the simulated data for comparison with results
 from Cluster-Circ Data. Number of simulated samples: 500.
 }
 \examples{
-cc_simu(n = 100)
+cc_simu(n = 300)
 }

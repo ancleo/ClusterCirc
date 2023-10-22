@@ -17,7 +17,7 @@
 #'
 #' @export
 #'
-#' @examples cc_simu(n = 100)
+#' @examples cc_simu(n = 300)
 
 cc_simu <- function(n) {
 

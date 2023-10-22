@@ -9,7 +9,7 @@
 #' @param p Number of clusters.
 #' @param m Number of variables.
 #' @param q Precision index for the algorithm. Precision is higher for larger
-#'   values. Default = 10.
+#'   values. Default = 10. Must be an integer > 0.
 #'
 #' @return Returns item clusters with optimal circumplexity and Cluster-Circ
 #'   indices: Overall Cluster-Circ results, indices for clusters and for items.
