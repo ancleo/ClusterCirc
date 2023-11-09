@@ -55,7 +55,7 @@ spacing).
 
 2.  **cc_simu:** Can be used to assess circumplex fit of the dataset.
     The function uses the specifications of the data and creates samples
-    from a population with perfect circumplex spacing of clusters (Default
+    from a population with perfect circumplex spacing of clusters (default
     number of samples = 500). Results for the dataset (spacing coefficients 
     from cc_data) are compared to results from cc_simu to evaluate
     circumplexity in the data. cc_simu can only be used after performing
@@ -65,7 +65,7 @@ See function documentation for description of parameters (?cc_data, ?cc_simu).
 
 **Using ClusterCirc functions on exemplary (simulated) data:**
 
-Perfect circumplex clusters with n = 100 subjects, p = 3 clusters, m =
+Perfect circumplex clusters with n = 300 subjects, p = 3 clusters, m =
 18 variables.
 
 **1. cc_data:**

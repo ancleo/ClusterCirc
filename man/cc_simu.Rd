@@ -4,14 +4,17 @@
 \alias{cc_simu}
 \title{Cluster-Circ Simu}
 \usage{
-cc_simu(n)
+cc_simu(n, samples = 500)
 }
 \arguments{
 \item{n}{= Number of subjects in the sample.}
+
+\item{samples}{= Number of samples for the simulation. Default = 500.
+Decrease number of samples for faster computation (minimum = 100)}
 }
 \value{
 Returns Cluster-Circ indices for the population data and results for
-500 simulated samples (mean, SD, min, max). Empirical 'spacing with h²'
+simulated samples (mean, SD, min, max). Empirical 'spacing with h²'
 from your data will be compared to the mean value from the simulated
 samples with perfect circumplexity to test whether circumplex fit of the
 empirical data is acceptable (using the cumulative probability of the
@@ -22,8 +25,8 @@ Simulates data with perfect circumplex clusters in the population
 using parameters from the empirical data (sample size, number of clusters,
 number of items, empirical within-cluster range, mean item communality).
 Performs Cluster-Circ on the simulated data for comparison with results
-from Cluster-Circ Data. Number of simulated samples: 500.
+from Cluster-Circ Data. cc_simu can only be used after performing cc_data.
 }
 \examples{
-cc_simu(n = 300)
+cc_simu(n = 300, samples = 500)
 }

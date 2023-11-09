@@ -14,7 +14,7 @@ cc_raw(A, p, m, q)
 \item{m}{Number of variables.}
 
 \item{q}{Precision index for the algorithm. Precision is higher for larger
-values. Default = 10.}
+values. Default = 10. Must be an integer > 0.}
 }
 \value{
 Returns item clusters with optimal circumplexity and Cluster-Circ

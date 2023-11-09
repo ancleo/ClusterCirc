@@ -13,12 +13,12 @@ cc_data(file, type = "scores", p, m, q = 10)
 "loadings" if the file contains loadings from PCA or EFA.
 Default is "scores".}
 
-\item{p}{Number of clusters.}
+\item{p}{Number of clusters (minimum = 2).}
 
 \item{m}{Number of variables.}
 
 \item{q}{Precision index for the algorithm. Precision is higher for larger
-values. Default = 10.}
+values. Default = 10. Must be an integer > 0.}
 }
 \value{
 Returns item clusters with optimal circumplexity and Cluster-Circ
