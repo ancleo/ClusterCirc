@@ -1,5 +1,5 @@
 # ClusterCirc
-This github repository features an R package "ClusterCirc", which finds
+This github repository features the R package "ClusterCirc", which finds
 item clusters with optimal circumplex spacing in your data.
 
 ## Installing ClusterCirc in R:
@@ -91,15 +91,15 @@ spacing).
 
 3.  **cc_simu:**  
     Can be used to assess circumplex fit of the dataset.
-    The function uses the specifications of the data and creates 500
-    samples from a population with perfect circumplex spacing of
-    clusters. Results for the dataset (spacing coefficients from
-    cc_data) are compared to results from cc_simu to evaluate
+    The function uses the specifications of the data and creates samples
+    from a population with perfect circumplex spacing of clusters (default
+    number of samples = 500). Results for the dataset (spacing coefficients 
+    from cc_data) are compared to results from cc_simu to evaluate
     circumplexity in the data. cc_simu can only be used after performing
     cc_data.
 
-    Usage for exemplary data (100 subjects in data):       
-    **cc_simu(n = 100)**  
+    Usage for exemplary data (300 subjects in data):       
+    **cc_simu(n = 300, samples = 500)**  
 
 See function documentation in R for more detailed description and usage of functions:  
 **?cc_data**    
