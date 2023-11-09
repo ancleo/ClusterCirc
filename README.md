@@ -1,5 +1,5 @@
 # ClusterCirc
-This github repository features an R package "ClusterCirc", which finds
+This github repository features the R package "ClusterCirc", which finds
 item clusters with optimal circumplex spacing in your data.
 
 ## Installing ClusterCirc in R:
