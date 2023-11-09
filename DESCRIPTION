@@ -16,9 +16,9 @@ Description: ClusterCirc analyzes data with circular structure and finds item
     computed to assess circumplex spacing (0 = optimal circumplexity).
     There are two functions for users.
     1. cc_data sorts items into clusters with optimal circumplex spacing.
-    2. cc_simu creates 500 samples from a population with perfect circumplex
-    spacing of clusters and the specifications of the data to compare with
-    the spacing coefficients from cc_data.
+    2. cc_simu creates samples from a population with perfect circumplex
+    spacing of clusters and the specifications of the data to assess circumplex 
+    fit of the data.
 License: `use_gpl_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

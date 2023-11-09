@@ -8,7 +8,7 @@
 #' @param type Fill in "scores" if the file contains raw scores of variables,
 #'    "loadings" if the file contains loadings from PCA or EFA.
 #'    Default is "scores".
-#' @param p Number of clusters.
+#' @param p Number of clusters (minimum = 2).
 #' @param m Number of variables.
 #' @param q Precision index for the algorithm. Precision is higher for larger
 #'   values. Default = 10. Must be an integer > 0.
@@ -30,6 +30,7 @@ cc_data <- function(file, type = "scores", p, m, q = 10) {
 
   if (type == "loadings") {
     A <- file
+    A <- data.matrix(A, rownames.force = NA)
   }
 
   cc_results <- cc_raw(A, p, m, q)

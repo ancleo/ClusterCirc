@@ -4,12 +4,14 @@
 #'    using parameters from the empirical data (sample size, number of clusters,
 #'    number of items, empirical within-cluster range, mean item communality).
 #'    Performs Cluster-Circ on the simulated data for comparison with results
-#'    from Cluster-Circ Data. Number of simulated samples: 500.
+#'    from Cluster-Circ Data. cc_simu can only be used after performing cc_data.
 #'
 #' @param n = Number of subjects in the sample.
+#' @param samples = Number of samples for the simulation. Default = 500.
+#'    Decrease number of samples for faster computation (minimum = 100)
 #'
 #' @return Returns Cluster-Circ indices for the population data and results for
-#'    500 simulated samples (mean, SD, min, max). Empirical 'spacing with h²'
+#'    simulated samples (mean, SD, min, max). Empirical 'spacing with h²'
 #'    from your data will be compared to the mean value from the simulated
 #'    samples with perfect circumplexity to test whether circumplex fit of the
 #'    empirical data is acceptable (using the cumulative probability of the
@@ -17,9 +19,9 @@
 #'
 #' @export
 #'
-#' @examples cc_simu(n = 300)
+#' @examples cc_simu(n = 300, samples = 500)
 
-cc_simu <- function(n) {
+cc_simu <- function(n, samples = 500) {
 
   cc_data_done <- exists("for_cc_simu")
 
@@ -34,7 +36,7 @@ cc_simu <- function(n) {
     h_sq <- for_cc_simu[4]
     h <- sqrt(rep(h_sq, m))
     c_wrange <- rep(for_cc_simu[5], p)
-    n_simu <- 500
+    n_simu <- samples
     n_pop <- n_simu * n
     mf <- m + 2
     # mf = Number of latent variables (m +2 circumplex factors)
@@ -86,7 +88,7 @@ cc_simu <- function(n) {
 
     cl_dis <- 360 / p
     ones <- rep(1, p)
-    w_dis <- c_wrange %/% (mc - ones)
+    w_dis <- c_wrange / (mc - ones)
 
     for (c in 1:p) {
       th <- rep(mc[c], 0)
@@ -117,7 +119,7 @@ cc_simu <- function(n) {
       }
     }
 
-    # Conversion with sin/cos works only for theta >= 0 and >= pi/2 (90°).
+    # Conversion with sin/cos works only for theta >= 0 and <= pi/2 (90°).
     # Help vector theta_h for compuation of population loadings.
 
     theta_h <- theta
@@ -434,7 +436,7 @@ cc_simu <- function(n) {
     cat("==================================", "\n")
 
     cat("\n")
-    cat("The following tables show results for 500 simulated samples from the population",
+    cat("The following tables show results for simulated samples from the population",
         "\n")
     cat("with perfect circumplex clusters.", "\n")
 

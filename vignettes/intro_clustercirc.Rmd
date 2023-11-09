@@ -54,10 +54,10 @@ spacing).
     performed when cc_data is called.
 
 2.  **cc_simu:** Can be used to assess circumplex fit of the dataset.
-    The function uses the specifications of the data and creates 500
-    samples from a population with perfect circumplex spacing of
-    clusters. Results for the dataset (spacing coefficients from
-    cc_data) are compared to results from cc_simu to evaluate
+    The function uses the specifications of the data and creates samples
+    from a population with perfect circumplex spacing of clusters (Default
+    number of samples = 500). Results for the dataset (spacing coefficients 
+    from cc_data) are compared to results from cc_simu to evaluate
     circumplexity in the data. cc_simu can only be used after performing
     cc_data.
 
@@ -77,5 +77,5 @@ cc_data(file = data_ex, type = "scores", p = 3, m = 18, q = 10)
 **2. cc_simu:**
 
 ```{r}
-cc_simu(300)
+cc_simu(n = 300, samples = 500)
 ```
