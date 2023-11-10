@@ -42,6 +42,9 @@ please download the current release of this repository. It contains all
 files of the R package (Releases in the right-hand corner of this github website). 
 Source code of the ClusterCirc functions can be found in the subfolder "R".
 
+https://github.com/anweide/ClusterCirc/releases/tag/v2.0.0
+
+
 ## Using and citing ClusterCirc:
 
 The manuscript that presents Cluster-Circ has been submitted to a peer-
