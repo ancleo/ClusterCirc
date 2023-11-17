@@ -2,7 +2,7 @@ Package: ClusterCirc
 Title: Finding clusters for circumplex instruments
 Version: 0.0.0.9000
 Authors@R: 
-    person("Anneke", "Weide", , "aweide@uni-bonn.de", 
+    person("ancleo", "ancleo", , "persoenlichkeitsmix@gmx.de", 
     role = c("aut", "cre"),
     comment = c(ORCID = "0000-0002-6593-5742"))
 Description: ClusterCirc analyzes data with circular structure and finds item 

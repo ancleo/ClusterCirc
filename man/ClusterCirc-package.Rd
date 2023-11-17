@@ -9,7 +9,7 @@
 ClusterCirc analyzes data with circular structure and finds item clusters with optimal circumplex spacing. ClusterCirc is based on item loadings on factors or components, which are translated into angles in a circular arrangement. ClusterCirc can sort items into clusters that yield optimal circumplex spacing. Optimal circumplex spacing for item clusters is given if clusters are evenly distributed across the circle (equal spacing between clusters) and if items are clustered closely around their cluster centroid (minimal within-cluster spacing). Spacing coefficients are computed to assess circumplex spacing (0 = optimal circumplexity). There are two functions for users. 1. cc_data sorts items into clusters with optimal circumplex spacing. 2. cc_simu creates samples from a population with perfect circumplex spacing of clusters and the specifications of the data to assess circumplex fit of the data.
 }
 \author{
-\strong{Maintainer}: Anneke Weide \email{aweide@uni-bonn.de} (\href{https://orcid.org/0000-0002-6593-5742}{ORCID})
+\strong{Maintainer}: ancleo ancleo \email{persoenlichkeitsmix@gmx.de} (\href{https://orcid.org/0000-0002-6593-5742}{ORCID})
 
 }
 \keyword{internal}

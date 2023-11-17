@@ -486,9 +486,9 @@ cc_simu <- function(n, samples = 500) {
          "\n")
     cat ("at the current stage of the publication process:", "\n")
     cat("\n")
-    cat("Weide et al. (2022): Cluster-Circ: Finding item clusters for circumplex",
+    cat("Note to reviewers: Please don't open the preprint article during blind peer-review.",
         "\n")
-    cat ("instruments. PsyArxiv (preprint). https://psyarxiv.com/yf37w/")
+    cat ("https://psyarxiv.com/yf37w/")
 
   }
 
