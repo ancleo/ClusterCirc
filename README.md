@@ -46,10 +46,12 @@ Source code of the ClusterCirc functions can be found in the subfolder "R".
 
 The manuscript that presents Cluster-Circ has been submitted to a peer-
 reviewed journal. When using Cluster-Circ, please cite the preprint version 
-at the current stage of the publication process: 
+at the current stage of the publication process:
 
-Weide et al. (2022): Cluster-Circ: Finding item clusters for circumplex 
-instruments. PsyArxiv (preprint). https://psyarxiv.com/yf37w/
+https://psyarxiv.com/yf37w/
+
+(Note to reviewers: Please don't open the preprint version of the manuscript
+to ensure double-blind review).
 
 ## Description of ClusterCirc
 
