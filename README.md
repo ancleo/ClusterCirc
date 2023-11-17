@@ -7,13 +7,13 @@ Type the following commands in the R console to install and load ClusterCirc:
 
 **install.packages("devtools")**  
 **library(devtools)**    
-**install_github("anweide/ClusterCirc")**    
+**install_github("ancleo/ClusterCirc")**    
 **library(ClusterCirc)**    
 
 ClusterCirc depends on two external R packages: psych and knitr. If the
 dependencies are not installed automatically, you can try the following:
 
-**install_github("anweide/ClusterCirc", dependencies = TRUE)**    
+**install_github("ancleo/ClusterCirc", dependencies = TRUE)**    
 **library(ClusterCirc)**    
 
 OR install the dependencies manually and re-install ClusterCirc by:
@@ -22,14 +22,14 @@ OR install the dependencies manually and re-install ClusterCirc by:
 **library(psych)**  
 **install.packages("knitr")**  
 **library(knitr)**  
-**install_github("anweide/ClusterCirc")**  
+**install_github("ancleo/ClusterCirc")**  
 **library(ClusterCirc)**  
 
 To save installation time, the previous commands do not install the vignette, 
 which contains a detailed description and demonstration of ClusterCirc functions.
 If you want to install the vignette as well, type:  
 
-**install_github("anweide/ClusterCirc", build_vignettes = TRUE)**      
+**install_github("ancleo/ClusterCirc", build_vignettes = TRUE)**      
 **library(ClusterCirc)**      
 
 The description, vignette, and function documentation can be seen by  
