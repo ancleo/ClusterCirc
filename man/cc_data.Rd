@@ -22,7 +22,7 @@ values. Default = 10. Must be an integer > 0.}
 }
 \value{
 Returns item clusters with optimal circumplexity and Cluster-Circ
-indices: Overall Cluster-Circ results, indices for clusters and for items.
+coefficients: Overall Cluster-Circ results, coefficients for clusters and for items.
 }
 \description{
 Finds item clusters with optimal circumplex spacing in your data.

@@ -13,7 +13,7 @@ cc_simu(n, samples = 500)
 Decrease number of samples for faster computation (minimum = 100)}
 }
 \value{
-Returns Cluster-Circ indices for the population data and results for
+Returns Cluster-Circ coefficients for the population data and results for
 simulated samples (mean, SD, min, max). Empirical 'spacing with h²'
 from your data will be compared to the mean value from the simulated
 samples with perfect circumplexity to test whether circumplex fit of the
