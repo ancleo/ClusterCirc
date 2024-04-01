@@ -2,31 +2,38 @@
 % Please edit documentation in R/cc_simu.R
 \name{cc_simu}
 \alias{cc_simu}
-\title{Cluster-Circ Simu}
+\title{ClusterCirc-Simu}
 \usage{
-cc_simu(n, samples = 500)
+cc_simu(n, samples = 500, alpha = 1)
 }
 \arguments{
 \item{n}{= Number of subjects in the sample.}
 
 \item{samples}{= Number of samples for the simulation. Default = 500.
-Decrease number of samples for faster computation (minimum = 100)}
+Decrease number of samples for faster computation. Recommended minimum = 100.}
+
+\item{alpha}{= Type-I error in percent for significance testing of deviation
+from perfect circumplexity in the data. Options: 0.1, 1, 5, 10, 15, 20, 25.
+Default = 1 (\%).}
 }
 \value{
-Returns Cluster-Circ coefficients for the population data and results for
-simulated samples (mean, SD, min, max). Empirical 'spacing with h²'
+Returns ClusterCirc coefficients for the population data and results for
+simulated samples (mean, SD, min, max). Empirical 'spacing (weighted with h²)'
 from your data will be compared to the mean value from the simulated
 samples with perfect circumplexity to test whether circumplex fit of the
-empirical data is acceptable (using the cumulative probability of the
-standard normal distribution for p < .01, one-tailed).
+empirical data is acceptable. The empirical spc_h value is compared to a
+cutoff value using the standard normal distribution and the chosen alpha
+level (one-tailed significance test). The empirical z-value is also given.
 }
 \description{
 Simulates data with perfect circumplex clusters in the population
 using parameters from the empirical data (sample size, number of clusters,
 number of items, empirical within-cluster range, mean item communality).
-Performs Cluster-Circ on the simulated data for comparison with results
-from Cluster-Circ Data. cc_simu can only be used after performing cc_data.
+Performs ClusterCirc on the simulated data for comparison with results
+from ClusterCirc-Data. Choose item communalities (default in cc_data) as
+weights for variables in cc_data for adequate comparison.
+Number of simulated samples: 500.
 }
 \examples{
-cc_simu(n = 300, samples = 500)
+cc_simu(n = 300, samples = 500, alpha = 1)
 }

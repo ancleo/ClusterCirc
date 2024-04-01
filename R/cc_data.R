@@ -1,8 +1,8 @@
-#' Cluster-Circ Data
+#' ClusterCirc-Data
 #'
 #' @description Finds item clusters with optimal circumplex spacing in your data.
 #'    If the file contains raw scores (type = "scores"), PCA without rotation
-#'    will be performed on the data before running Cluster-Circ.
+#'    will be performed on the data before running ClusterCirc.
 #'
 #' @param file File to be used for the analysis.
 #' @param type Fill in "scores" if the file contains raw scores of variables,
@@ -10,16 +10,20 @@
 #'    Default is "scores".
 #' @param p Number of clusters (minimum = 2).
 #' @param m Number of variables.
+#' @param w_com Is "TRUE" if communalities of the variables are used as weights.
+#'    Is "FALSE" if user-defined weights should be used. Default = "TRUE".
+#' @param w Vector with weights for the variables. Weights need to be in the same
+#'    order as the variables in the data. Default = item communalities.
 #' @param q Precision index for the algorithm. Precision is higher for larger
 #'   values. Default = 10. Must be an integer > 0.
 #'
-#' @return Returns item clusters with optimal circumplexity and Cluster-Circ
-#'   coefficients: Overall Cluster-Circ results, coefficients for clusters and for items.
+#' @return Returns item clusters with optimal circumplexity and ClusterCirc
+#'   coefficients: Overall ClusterCirc results, coefficients for clusters and for items.
 #' @export
 #'
-#' @examples cc_data(file = data_ex, type = "scores", p = 3, m = 18, q = 10)
+#' @examples cc_data(file = data_ex, type = "scores", p = 3, m = 18, w_com = "TRUE", w, q = 10)
 #'
-cc_data <- function(file, type = "scores", p, m, q = 10) {
+cc_data <- function(file, type = "scores", p, m, w_com = "TRUE", w, q = 10) {
 
   if (type == "scores") {
     fit <- psych::principal(file, nfactors = 2, rotate = "none")
@@ -30,10 +34,9 @@ cc_data <- function(file, type = "scores", p, m, q = 10) {
 
   if (type == "loadings") {
     A <- file
-    A <- data.matrix(A, rownames.force = NA)
   }
 
-  cc_results <- cc_raw(A, p, m, q)
+  cc_results <- cc_raw(A, p, m, w_com, w, q)
 
   overall <- cc_results[[1]]
   clusters <- cc_results[[2]]
@@ -42,7 +45,7 @@ cc_data <- function(file, type = "scores", p, m, q = 10) {
 
   as.data.frame(overall)
   colnames(overall) = c(
-    "Spacing (with h²)",
+    "Spacing (weighted)",
     "Spacing",
     "Between-cluster spacing",
     "Within-cluster proximity"
@@ -63,7 +66,7 @@ cc_data <- function(file, type = "scores", p, m, q = 10) {
     "Cluster",
     "Item",
     "Angle",
-    "Communality",
+    "Weight (default: communality)",
     "Item-cluster spacing",
     "Distance to cluster center"
   )
@@ -74,7 +77,7 @@ cc_data <- function(file, type = "scores", p, m, q = 10) {
   for_cc_simu <<- for_cc_simu
 
   cat("\n ==============================")
-  cat("\n RESULTS CLUSTER-CIRC DATA ")
+  cat("\n RESULTS CLUSTERCIRC-DATA ")
   cat("\n ==============================", "\n")
 
   cat("\n OVERALL")
@@ -85,14 +88,19 @@ cc_data <- function(file, type = "scores", p, m, q = 10) {
   print(knitr::kable(items, "simple", digits = 3))
 
   cat("\n")
-  cat("Range of all Cluster-Circ coefficients: 0-1 (0 = perfect circumplex spacing).",
-      "\n")
-  cat("The decision for the final item clusters is based on 'spacing (with h²)'.",
+  cat("Range of all ClusterCirc coefficients: 0-1 (0 = perfect circumplex spacing).",
       "\n")
   cat("\n")
-  cat("The manuscript that presents Cluster-Circ has been submitted to a peer-",
+  cat("The decision for the final item clusters is based on 'spacing (weighted)'.",
       "\n")
-  cat ("reviewed journal. When using Cluster-Circ, please cite the preprint version",
+  cat("Weights are communalities of the items if not otherwise specified",
+      "\n")
+  cat("to account for (un-)reliability of measurement.",
+      "\n")
+  cat("\n")
+  cat("The manuscript that presents ClusterCirc has been submitted to a peer-",
+      "\n")
+  cat ("reviewed journal. When using ClusterCirc, please cite the preprint version",
        "\n")
   cat ("at the current stage of the publication process:", "\n")
   cat("\n")

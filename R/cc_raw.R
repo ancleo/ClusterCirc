@@ -1,23 +1,28 @@
-#' Cluster-Circ: Raw algorithm
+#' ClusterCirc: Raw algorithm
 #'
-#' @description Is a help function that performs the Cluster-Circ algorithm
-#'    within Cluster-Circ Data (cc_data) and Cluster-Circ Simu (cc_simu).
-#'    All of the arguments are taken from cc_data. cc_raw cannot be performed
-#'    on its own.
+#' @description Is a help function that performs the ClusterCirc search algorithm
+#'    within ClusterCirc-Data (cc_data) and ClusterCirc-Simu (cc_simu).
+#'    All of the arguments are taken from cc_data or cc_simu. cc_raw cannot be
+#'    performed on its own.
 #'
-#' @param A Loading matrix to perform Cluster-Circ on.
+#' @param A Loading matrix to perform ClusterCirc on.
 #' @param p Number of clusters.
 #' @param m Number of variables.
+#' @param w_com Is "TRUE" if communalities of the variables are used as weights.
+#'    Is "FALSE" if user-defined weights should be used. Default = "TRUE".
+#' @param w Vector with weights for the variables. Weights need to be in the same
+#'    order as the variables in the data. Default = item communalities.
 #' @param q Precision index for the algorithm. Precision is higher for larger
-#'   values. Default = 10. Must be an integer > 0.
+#'   values. Default = 10.
 #'
-#' @return Returns item clusters with optimal circumplexity and Cluster-Circ
-#'   indices: Overall Cluster-Circ results, indices for clusters and for items.
+#' @return Returns item clusters with optimal circumplexity and ClusterCirc
+#'   coefficients: Overall ClusterCirc results, coefficients for clusters and for items.
 #' @export
 #'
-#' @examples cc_raw(A, p = 3, m = 18, q = 10)
+#' @examples cc_raw(A, p = 3, m = 18, w_com = "TRUE", w, q = 10)
 
-cc_raw <- function(A, p, m, q) {
+
+cc_raw <- function(A, p, m, w_com, w, q) {
 
   # ---------------------
   # ---- PREPARATION ----
@@ -26,10 +31,14 @@ cc_raw <- function(A, p, m, q) {
   # Kaiser-normalization of loadings for simpler computation of angles
 
   h_sq <- apply(A ^ 2, 1, sum)
+  h_sq <- apply(A ^ 2, 1, sum)
   h_rt <- sqrt(h_sq)
   hsq_mn <- mean(h_sq)
   Mh_rt <- matrix(diag(h_rt), ncol = m)
   A_k <- solve(Mh_rt) %*% A
+
+  if (w_com == "TRUE")
+    w <- h_sq
 
   # Compute and sort theta: item angles in degrees
   # r = radians, p = positive
@@ -67,16 +76,16 @@ cc_raw <- function(A, p, m, q) {
       if (rk_th[i1] == i2) {
         ival[i2, 1] <- i1
         ival[i2, 2] <- theta[i1]
-        ival[i2, 3] <- h_sq[i1]
+        ival[i2, 3] <- w[i1]
       }
     }
   }
 
   # --------------------------------
-  # ---- CLUSTER-CIRC ALGORITHM ----
+  # ---- CLUSTERCIRC ALGORITHM ----
   # --------------------------------
 
-  spacingh <- 361
+  spacingw <- 361
 
   for (d in 0:round(360 * q / p)) {
     ci_h <- rep(0, m)
@@ -231,19 +240,19 @@ cc_raw <- function(A, p, m, q) {
     space <- 360 / p
     ic_dev <- matrix(0, m, p)
     ic_devp <- matrix(0, m, p)
-    ic_dcom <- matrix(0, m, p)
+    ic_dw <- matrix(0, m, p)
 
     for (i in 1:m) {
       for (c1 in 1:p) {
         c2 <- ival_h[i, 1]
         i_ang <- ival_h[i, 3]
         c_ang <- cvalh[c1, 3]
-        i_com <- ival_h[i, 4]
+        i_w <- ival_h[i, 4]
         ic_dis[i, c1] <- i_ang - c_ang
         id_dis <- (c2 - 1) * space - (c1 - 1) * space
         ic_dev[i, c1] <- ic_dis[i, c1] - id_dis
         ic_devp[i, c1] <- ic_dev[i, c1] / space
-        ic_dcom[i, c1] <- ic_devp[i, c1] * sqrt(i_com)
+        ic_dw[i, c1] <- ic_devp[i, c1] * sqrt(i_w)
       }
     }
 
@@ -252,31 +261,33 @@ cc_raw <- function(A, p, m, q) {
     ispc_sq <- (apply(ic_devp ^ 2, 1, sum)) / p
     ispc <- sqrt(ispc_sq)
 
-    # With communalities (h) for spacing index (not interpretable on item level)
+    # With weights (default = h_sq) for spacing index (not interpretable on item level)
 
-    ispc_hsq <- (apply(ic_dcom ^ 2, 1, sum)) / (p * hsq_mn)
-    ispc_h <- sqrt(ispc_hsq)
+    w_mn <- mean(w)
+
+    ispc_wsq <- (apply(ic_dw ^ 2, 1, sum)) / (p * w_mn)
+    ispc_w <- sqrt(ispc_wsq)
 
     # Overall spacing
 
     spc_sq <- (sum(ispc_sq)) / m
     spc <- sqrt(spc_sq)
 
-    spc_hsq <- (sum(ispc_hsq)) / m
-    spc_h <- sqrt(spc_hsq)
+    spc_wsq <- (sum(ispc_wsq)) / m
+    spc_w <- sqrt(spc_wsq)
 
-    # Dismiss partitions with empty clusters by making spc_h larger than
-    # the initial spacingh (361). If this happens for all possible divisions,
+    # Dismiss partitions with empty clusters by making spc_w larger than
+    # the initial spacingw (361). If this happens for all possible divisions,
     # the number of clusters is too large.
 
     for (c in 1:p) {
       if (c_m[c] == 99) {
-        spc_h <- 50000
+        spc_w <- 50000
       }
     }
 
-    if (spc_h < spacingh) {
-      spacingh <- spc_h
+    if (spc_w < spacingw) {
+      spacingw <- spc_w
       spacing <- spc
       items <- cbind(ival_h, ispc)
       clusters <- cvalh
@@ -285,14 +296,14 @@ cc_raw <- function(A, p, m, q) {
 
   }
 
-  if (spacingh == 361) {
+  if (spacingw == 361) {
     print (
-      "Cluster-Circ could not finish, at least one of the clusters is empty.
+      "ClusterCirc could not finish, at least one of the clusters is empty.
        Try a smaller number of clusters or include more variables."
     )
   }
 
-  if (spacingh < 361) {
+  if (spacingw < 361) {
 
     # Between-cluster spacing
 
@@ -365,9 +376,9 @@ cc_raw <- function(A, p, m, q) {
       }
     }
 
-    # Final overall Cluster-Circ indices
+    # Final overall ClusterCirc indices
 
-    overall <- cbind(spacingh, spacing, bcs_p, wcp_p)
+    overall <- cbind(spacingw, spacing, bcs_p, wcp_p)
 
     # Parameters for cc_simu
 

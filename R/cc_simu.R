@@ -1,27 +1,33 @@
-#' Cluster-Circ Simu
+#' ClusterCirc-Simu
 
 #' @description Simulates data with perfect circumplex clusters in the population
 #'    using parameters from the empirical data (sample size, number of clusters,
 #'    number of items, empirical within-cluster range, mean item communality).
-#'    Performs Cluster-Circ on the simulated data for comparison with results
-#'    from Cluster-Circ Data. cc_simu can only be used after performing cc_data.
+#'    Performs ClusterCirc on the simulated data for comparison with results
+#'    from ClusterCirc-Data. Choose item communalities (default in cc_data) as
+#'    weights for variables in cc_data for adequate comparison.
+#'    Number of simulated samples: 500.
 #'
 #' @param n = Number of subjects in the sample.
 #' @param samples = Number of samples for the simulation. Default = 500.
-#'    Decrease number of samples for faster computation (minimum = 100)
+#'    Decrease number of samples for faster computation. Recommended minimum = 100.
+#' @param alpha = Type-I error in percent for significance testing of deviation
+#'    from perfect circumplexity in the data. Options: 0.1, 1, 5, 10, 15, 20, 25.
+#'    Default = 1 (%).
 #'
-#' @return Returns Cluster-Circ coefficients for the population data and results for
-#'    simulated samples (mean, SD, min, max). Empirical 'spacing with h²'
+#' @return Returns ClusterCirc coefficients for the population data and results for
+#'    simulated samples (mean, SD, min, max). Empirical 'spacing (weighted with h²)'
 #'    from your data will be compared to the mean value from the simulated
 #'    samples with perfect circumplexity to test whether circumplex fit of the
-#'    empirical data is acceptable (using the cumulative probability of the
-#'    standard normal distribution for p < .01, one-tailed).
+#'    empirical data is acceptable. The empirical spc_h value is compared to a
+#'    cutoff value using the standard normal distribution and the chosen alpha
+#'    level (one-tailed significance test). The empirical z-value is also given.
 #'
 #' @export
 #'
-#' @examples cc_simu(n = 300, samples = 500)
+#' @examples cc_simu(n = 300, samples = 500, alpha = 1)
 
-cc_simu <- function(n, samples = 500) {
+cc_simu <- function(n, samples = 500, alpha = 1) {
 
   cc_data_done <- exists("for_cc_simu")
 
@@ -88,7 +94,7 @@ cc_simu <- function(n, samples = 500) {
 
     cl_dis <- 360 / p
     ones <- rep(1, p)
-    w_dis <- c_wrange / (mc - ones)
+    w_dis <- c_wrange %/% (mc - ones)
 
     for (c in 1:p) {
       th <- rep(mc[c], 0)
@@ -119,7 +125,7 @@ cc_simu <- function(n, samples = 500) {
       }
     }
 
-    # Conversion with sin/cos works only for theta >= 0 and <= pi/2 (90°).
+    # Conversion with sin/cos works only for theta >= 0 and >= pi/2 (90°).
     # Help vector theta_h for compuation of population loadings.
 
     theta_h <- theta
@@ -179,10 +185,10 @@ cc_simu <- function(n, samples = 500) {
     A_pop
 
     # -------------------------------------------
-    # --- CLUSTER-CIRC ON POPULATION LOADINGS ---
+    # --- CLUSTERCIRC ON POPULATION LOADINGS ---
     # -------------------------------------------
 
-    cc_pop <- cc_raw(A_pop, p, m, q)
+    cc_pop <- cc_raw(A_pop, p, m, w_com = "TRUE", w, q)
 
     overall_pop <- cc_pop[[1]]
     clusters_pop <- cc_pop[[2]]
@@ -285,10 +291,10 @@ cc_simu <- function(n, samples = 500) {
       A_s
 
       # -------------------------------
-      # --- CLUSTER-CIRC ON SAMPLES ---
+      # --- CLUSTERCIRC ON SAMPLES ---
       # -------------------------------
 
-      cc_s <- cc_raw(A_s, p, m, q)
+      cc_s <- cc_raw(A_s, p, m, w_com = "TRUE", w, q)
 
       overall_s <- cc_s[[1]]
       clusters_s <- cc_s[[2]]
@@ -384,13 +390,30 @@ cc_simu <- function(n, samples = 500) {
 
     spch_dat <- cc_overall[1]
     spch_sim <- mean_simu[1]
-    spch_sd = sd_simu[1]
-    cutoff <- spch_sim + 2.33 * spch_sd
+    spch_sd <- sd_simu[1]
+
+    emp_z <- (spch_dat - spch_sim) / spch_sd
+
+    if (alpha == 25)
+      cutoff <- spch_sim + 0.67 * spch_sd
+    if (alpha == 20)
+      cutoff <- spch_sim + 0.84 * spch_sd
+    if (alpha == 15)
+      cutoff <- spch_sim + 1.04 * spch_sd
+    if (alpha == 10)
+      cutoff <- spch_sim + 1.28 * spch_sd
+    if (alpha == 5)
+      cutoff <- spch_sim + 1.65 * spch_sd
+    if (alpha == 1)
+      cutoff <- spch_sim + 2.33 * spch_sd
+    if (alpha == 0.1)
+      cutoff <- spch_sim + 3.09 * spch_sd
+
     comp <- cutoff - spch_dat
 
     cat("\n")
     cat("============================", "\n")
-    cat("RESULTS CLUSTER-CIRC SIMU", "\n")
+    cat("RESULTS CLUSTERCIRC SIMU", "\n")
     cat("============================", "\n")
 
     cat("\n")
@@ -422,11 +445,11 @@ cc_simu <- function(n, samples = 500) {
 
     if (sortcorr_pop == 1) {
       cat("\n")
-      cat("Cluster-Circ found the intended circumplex clusters in the population.",
+      cat("ClusterCirc found the intended circumplex clusters in the population.",
           "\n")
     } else if (sortcorr_pop == 0) {
       cat("\n")
-      cat("Cluster-Circ did not find the intended circumplex clusters in the
+      cat("ClusterCirc did not find the intended circumplex clusters in the
           population.","\n")
     }
 
@@ -450,39 +473,47 @@ cc_simu <- function(n, samples = 500) {
     print(knitr::kable(overall_simu, "simple", digits = 3))
 
     cat("\n")
-    cat("Range of all Cluster-Circ coefficients: 0-1 (0 = perfect circumplex spacing).",
+    cat("Range of all ClusterCirc coefficients: 0-1 (0 = perfect circumplex spacing).",
         "\n")
-
-    cat("\n")
-    cat("Spacing with h² in empirical data:", spch_dat, "\n")
 
     cat("\n")
     cat("Recommendation: Circumplex fit of the empirical data is acceptable if 'spacing",
         "\n")
-    cat("with h²' in the empirical data is not larger than mean 'spacing with h²' + 2.33 SD",
+    cat("(weighted with h²)' in the empirical data is no larger than the cutoff value",
         "\n")
-    cat("from the simulated samples in Cluster-Circ Simu (corresponding to the cumulative",
+    cat("of the distribution of the simulated 'spacing (weighted with h²)' values.",
         "\n")
-    cat("probability of the standard normal distribution for p < .01, one-tailed).",
+    cat("ClusterCirc-Simu uses the chosen alpha level and the cumulative probability",
         "\n")
+    cat("of the standard normal distribution (one-tailed) to assess model fit.",
+        "\n")
+
+    cat("\n")
+    cat("Spacing (weighted with h²) in empirical data:", spch_dat, "\n")
+    cat("Cutoff value (alpha =", alpha, "%, one-tailed):", cutoff, "\n")
+    cat("Z-value of empirical spacing (weighted with h²):", emp_z, "\n")
 
     if (comp >= 0) {
       cat("\n")
-      cat("Here: Empirical 'spacing with h²' is within mean-spc_h + 2.33 SD from",
+      cat("Here: Empirical 'spacing (weighted with h²)' is within the acceptance",
           "\n")
-      cat("Cluster-Circ Simu -> Circumplex fit acceptable.", "\n")
+      cat("region of the simulated spc_h distribution.",
+          "\n")
+      cat("-> Circumplex fit acceptable.", "\n")
     }
     else if (comp < 0) {
       cat("\n")
-      cat("Here: Empirical 'spacing with h²' is larger than mean-spc_h + 2.33 SD",
+      cat("Here: Empirical 'spacing (weighted with h²)' exceeds the cutoff value",
           "\n")
-      cat("from Cluster-Circ Simu -> Low circumplex fit.", "\n")
+      cat("of the simulated spc_h distribution.",
+          "\n")
+      cat("-> Low circumplex fit.", "\n")
     }
 
     cat("\n")
-    cat("The manuscript that presents Cluster-Circ has been submitted to a peer-",
+    cat("The manuscript that presents ClusterCirc has been submitted to a peer-",
         "\n")
-    cat ("reviewed journal. When using Cluster-Circ, please cite the preprint version",
+    cat ("reviewed journal. When using ClusterCirc, please cite the preprint version",
          "\n")
     cat ("at the current stage of the publication process:", "\n")
     cat("\n")

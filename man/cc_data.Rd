@@ -2,9 +2,9 @@
 % Please edit documentation in R/cc_data.R
 \name{cc_data}
 \alias{cc_data}
-\title{Cluster-Circ Data}
+\title{ClusterCirc-Data}
 \usage{
-cc_data(file, type = "scores", p, m, q = 10)
+cc_data(file, type = "scores", p, m, w_com = "TRUE", w, q = 10)
 }
 \arguments{
 \item{file}{File to be used for the analysis.}
@@ -17,19 +17,25 @@ Default is "scores".}
 
 \item{m}{Number of variables.}
 
+\item{w_com}{Is "TRUE" if communalities of the variables are used as weights.
+Is "FALSE" if user-defined weights should be used. Default = "TRUE".}
+
+\item{w}{Vector with weights for the variables. Weights need to be in the same
+order as the variables in the data. Default = item communalities.}
+
 \item{q}{Precision index for the algorithm. Precision is higher for larger
 values. Default = 10. Must be an integer > 0.}
 }
 \value{
-Returns item clusters with optimal circumplexity and Cluster-Circ
-coefficients: Overall Cluster-Circ results, coefficients for clusters and for items.
+Returns item clusters with optimal circumplexity and ClusterCirc
+coefficients: Overall ClusterCirc results, coefficients for clusters and for items.
 }
 \description{
 Finds item clusters with optimal circumplex spacing in your data.
 If the file contains raw scores (type = "scores"), PCA without rotation
-will be performed on the data before running Cluster-Circ.
+will be performed on the data before running ClusterCirc.
 }
 \examples{
-cc_data(file = data_ex, type = "scores", p = 3, m = 18, q = 10)
+cc_data(file = data_ex, type = "scores", p = 3, m = 18, w_com = "TRUE", w, q = 10)
 
 }

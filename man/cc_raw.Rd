@@ -2,30 +2,36 @@
 % Please edit documentation in R/cc_raw.R
 \name{cc_raw}
 \alias{cc_raw}
-\title{Cluster-Circ: Raw algorithm}
+\title{ClusterCirc: Raw algorithm}
 \usage{
-cc_raw(A, p, m, q)
+cc_raw(A, p, m, w_com, w, q)
 }
 \arguments{
-\item{A}{Loading matrix to perform Cluster-Circ on.}
+\item{A}{Loading matrix to perform ClusterCirc on.}
 
 \item{p}{Number of clusters.}
 
 \item{m}{Number of variables.}
 
+\item{w_com}{Is "TRUE" if communalities of the variables are used as weights.
+Is "FALSE" if user-defined weights should be used. Default = "TRUE".}
+
+\item{w}{Vector with weights for the variables. Weights need to be in the same
+order as the variables in the data. Default = item communalities.}
+
 \item{q}{Precision index for the algorithm. Precision is higher for larger
-values. Default = 10. Must be an integer > 0.}
+values. Default = 10.}
 }
 \value{
-Returns item clusters with optimal circumplexity and Cluster-Circ
-indices: Overall Cluster-Circ results, indices for clusters and for items.
+Returns item clusters with optimal circumplexity and ClusterCirc
+coefficients: Overall ClusterCirc results, coefficients for clusters and for items.
 }
 \description{
-Is a help function that performs the Cluster-Circ algorithm
-within Cluster-Circ Data (cc_data) and Cluster-Circ Simu (cc_simu).
-All of the arguments are taken from cc_data. cc_raw cannot be performed
-on its own.
+Is a help function that performs the ClusterCirc search algorithm
+within ClusterCirc-Data (cc_data) and ClusterCirc-Simu (cc_simu).
+All of the arguments are taken from cc_data or cc_simu. cc_raw cannot be
+performed on its own.
 }
 \examples{
-cc_raw(A, p = 3, m = 18, q = 10)
+cc_raw(A, p = 3, m = 18, w_com = "TRUE", w, q = 10)
 }

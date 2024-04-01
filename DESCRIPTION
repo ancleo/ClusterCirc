@@ -1,6 +1,6 @@
 Package: ClusterCirc
-Title: Finding clusters for circumplex instruments
-Version: 0.0.0.9000
+Title: Finding item clusters for circumplex instruments
+Version: 0.0.0.2
 Authors@R: 
     person("an", "cleo", , "persoenlichkeitsmix@gmx.de", 
     role = c("aut", "cre"),
@@ -12,13 +12,16 @@ Description: ClusterCirc analyzes data with circular structure and finds item
     optimal circumplex spacing. Optimal circumplex spacing for item clusters is
     given if clusters are evenly distributed across the circle (equal spacing
     between clusters) and if items are clustered closely around their cluster 
-    centroid (minimal within-cluster spacing). Spacing coefficients are
-    computed to assess circumplex spacing (0 = optimal circumplexity).
-    There are two functions for users.
+    centroid (minimal within-cluster spacing/item heterogeneity). Spacing 
+    coefficients are computed to assess circumplex spacing (0 = optimal circumplexity).
+    There are three main functions.
     1. cc_data sorts items into clusters with optimal circumplex spacing.
     2. cc_simu creates samples from a population with perfect circumplex
-    spacing of clusters and the specifications of the data to assess circumplex 
-    fit of the data.
+    spacing of clusters and the specifications of the data to compare with
+    the spacing coefficients from cc_data.
+    3. cc_fix does not sort items into clusters. Instead, it computes ClusterCirc
+    coefficients for user-defined item clusters, which can be compared to results
+    for item clusters as suggested by cc_data.
 License: `use_gpl_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
