@@ -5,66 +5,34 @@
 #'    All of the arguments are taken from cc_data or cc_simu. cc_raw cannot be
 #'    performed on its own.
 #'
-#' @param A Loading matrix to perform ClusterCirc on.
+#' @param angles Item angles to perform ClusterCirc on.
+#' @param comm  Item communalities.
 #' @param p Number of clusters.
 #' @param m Number of variables.
-#' @param w_com Is "TRUE" if communalities of the variables are used as weights.
-#'    Is "FALSE" if user-defined weights should be used. Default = "TRUE".
 #' @param w Vector with weights for the variables. Weights need to be in the same
 #'    order as the variables in the data. Default = item communalities.
+#' @param e Cluster weight (0 <= e <= 1) defining the importance of within-cluster
+#'    proximity versus equal cluster spacing. Default is 1/p weighing all clusters
+#'    equally. e = 0: Maximum importance of between-cluster spacing, within-cluster
+#'    proximity is ignored. e = 1: Maximum importance of within-cluster proximity,
+#'    between-cluster spacing is ignored.
 #' @param q Precision index for the algorithm. Precision is higher for larger
 #'   values. Default = 10.
 #'
 #' @return Returns item clusters with optimal circumplexity and ClusterCirc
 #'   coefficients: Overall ClusterCirc results, coefficients for clusters and for items.
-#' @export
 #'
-#' @examples cc_raw(A, p = 3, m = 18, w_com = "TRUE", w, q = 10)
+#' @export
 
 
-cc_raw <- function(A, p, m, w_com, w, q) {
+cc_raw <- function(angles, comm, p, m, w, e, q) {
 
   # ---------------------
   # ---- PREPARATION ----
   # ---------------------
 
-  # Kaiser-normalization of loadings for simpler computation of angles
-
-  h_sq <- apply(A ^ 2, 1, sum)
-  h_sq <- apply(A ^ 2, 1, sum)
-  h_rt <- sqrt(h_sq)
-  hsq_mn <- mean(h_sq)
-  Mh_rt <- matrix(diag(h_rt), ncol = m)
-  A_k <- solve(Mh_rt) %*% A
-
-  if (w_com == "TRUE")
-    w <- h_sq
-
-  # Compute and sort theta: item angles in degrees
-  # r = radians, p = positive
-
-  A_pos <- abs(A_k)
-  th_rp <- asin(A_pos[1:m, 1])
-  th_r <- rep(0, m)
-  theta <- rep(0, m)
-
-  # Computation of angles depends on the quadrant (loadings positive/negative)
-
-  for (i in 1:nrow(A_k)) {
-    if (A_k[i, 1] >= 0 & A_k[i, 2] >= 0) {
-      th_r[i] <- th_rp[i]
-    }
-    if (A_k[i, 1] >= 0 & A_k[i, 2] < 0) {
-      th_r[i] <- pi - th_rp[i]
-    }
-    if (A_k[i, 1] < 0 & A_k[i, 2] < 0) {
-      th_r[i] <- pi + th_rp[i]
-    }
-    if (A_k[i, 1] < 0 & A_k[i, 2] >= 0) {
-      th_r[i] <- 2 * pi - th_rp[i]
-    }
-    theta[i] <- th_r[i] * 180 / pi
-  }
+  theta <- angles
+  w_mn <- mean(w)
 
   # Sort theta and keep item number in ival (for later re-assignment)
 
@@ -234,13 +202,14 @@ cc_raw <- function(A, p, m, w_com, w, q) {
       }
     }
 
-    # Compute spacing_h for each division
+    # Compute spacing_w for each division
 
     ic_dis <- matrix(0, m, p)
     space <- 360 / p
     ic_dev <- matrix(0, m, p)
     ic_devp <- matrix(0, m, p)
     ic_dw <- matrix(0, m, p)
+    ic_dwe <- matrix(0, m, p)
 
     for (i in 1:m) {
       for (c1 in 1:p) {
@@ -248,11 +217,22 @@ cc_raw <- function(A, p, m, w_com, w, q) {
         i_ang <- ival_h[i, 3]
         c_ang <- cvalh[c1, 3]
         i_w <- ival_h[i, 4]
+        e_own <- e
+        e_others <- (1-e)/(p-1)
         ic_dis[i, c1] <- i_ang - c_ang
         id_dis <- (c2 - 1) * space - (c1 - 1) * space
         ic_dev[i, c1] <- ic_dis[i, c1] - id_dis
         ic_devp[i, c1] <- ic_dev[i, c1] / space
         ic_dw[i, c1] <- ic_devp[i, c1] * sqrt(i_w)
+
+        if (c1 == c2) {
+          ic_dwe[i, c1] <- ic_dw[i, c1]*sqrt(e_own)
+        }
+
+        if (c1 != c2) {
+          ic_dwe[i,c1] <- ic_dw[i, c1]*sqrt(e_others)
+        }
+
       }
     }
 
@@ -261,11 +241,12 @@ cc_raw <- function(A, p, m, w_com, w, q) {
     ispc_sq <- (apply(ic_devp ^ 2, 1, sum)) / p
     ispc <- sqrt(ispc_sq)
 
-    # With weights (default = h_sq) for spacing index (not interpretable on item level)
+    # With weights for items (default = h_sq) and clusters (equal spacing assumption)
+    # for spacing index (not interpretable on item level)
 
     w_mn <- mean(w)
 
-    ispc_wsq <- (apply(ic_dw ^ 2, 1, sum)) / (p * w_mn)
+    ispc_wsq <- (apply(ic_dwe ^ 2, 1, sum)) / w_mn
     ispc_w <- sqrt(ispc_wsq)
 
     # Overall spacing
@@ -384,7 +365,7 @@ cc_raw <- function(A, p, m, w_com, w, q) {
 
     c_wrange <- clusters[, 4]
     wrange_c <- sum(c_wrange) / p
-    for_cc_simu <- cbind(p, m, q, hsq_mn, wrange_c)
+    for_cc_simu <- cbind(p, m, q, w_mn, wrange_c, e)
 
     output <- list(overall, clusters, items, for_cc_simu)
 

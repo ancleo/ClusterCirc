@@ -4,24 +4,54 @@
 \alias{cc_data}
 \title{ClusterCirc-Data}
 \usage{
-cc_data(file, type = "scores", p, m, w_com = "TRUE", w, q = 10)
+cc_data(
+  file,
+  n_sample,
+  input = "PCA",
+  p,
+  n_var,
+  w_com = TRUE,
+  w,
+  e_def = TRUE,
+  e,
+  comm,
+  q = 10
+)
 }
 \arguments{
 \item{file}{File to be used for the analysis.}
 
-\item{type}{Fill in "scores" if the file contains raw scores of variables,
-"loadings" if the file contains loadings from PCA or EFA.
-Default is "scores".}
+\item{n_sample}{Sample size.}
+
+\item{input}{Type of input to be inserted into ClusterCirc. Options are "PCA"
+(default), "Browne", "loadings", or "angles". "PCA" or "Browne" can be used
+if the file contains raw scores of the variables to obtain item angles from
+trigonometric transformation of two unrotated components (PCA) or from
+CIRCUM analysis (Browne). Insert "loadings" if the file contains loadings
+on two orthogonal axes from PCA or EFA or "angles" if it contains item angles.}
 
 \item{p}{Number of clusters (minimum = 2).}
 
-\item{m}{Number of variables.}
+\item{n_var}{Number of variables.}
 
-\item{w_com}{Is "TRUE" if communalities of the variables are used as weights.
-Is "FALSE" if user-defined weights should be used. Default = "TRUE".}
+\item{w_com}{Is TRUE if communalities of the variables are used as weights.
+Is FALSE if user-defined weights should be used. Default = TRUE.}
 
 \item{w}{Vector with weights for the variables. Weights need to be in the same
 order as the variables in the data. Default = item communalities.}
+
+\item{e_def}{Is TRUE if default values for cluster weights (importance of
+within-cluster proximity versus between-cluster spacing) are used.}
+
+\item{e}{Cluster weight (0 <= e <= 1) defining the importance of within-cluster
+proximity versus equal cluster spacing. Default is 1/p weighing all clusters
+equally. e = 0: Maximum importance of between-cluster spacing, within-cluster
+proximity is ignored. e = 1: Maximum importance of within-cluster proximity,
+between-cluster spacing is ignored.}
+
+\item{comm}{Vector with item communalities. Needs to be specified only if "input"
+is "angles". Otherwise, the argument is ignored, and item communalities are
+computed by the procedure.}
 
 \item{q}{Precision index for the algorithm. Precision is higher for larger
 values. Default = 10. Must be an integer > 0.}
@@ -32,10 +62,8 @@ coefficients: Overall ClusterCirc results, coefficients for clusters and for ite
 }
 \description{
 Finds item clusters with optimal circumplex spacing in your data.
-If the file contains raw scores (type = "scores"), PCA without rotation
-will be performed on the data before running ClusterCirc.
 }
 \examples{
-cc_data(file = data_ex, type = "scores", p = 3, m = 18, w_com = "TRUE", w, q = 10)
-
+cc_data(file = data_ex, n_sample = 300, input = "PCA", p = 3,
+  n_var = 18, w_com = TRUE, w, comm, e_def = TRUE, e, q = 10)
 }

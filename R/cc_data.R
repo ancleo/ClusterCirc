@@ -1,47 +1,123 @@
 #' ClusterCirc-Data
 #'
 #' @description Finds item clusters with optimal circumplex spacing in your data.
-#'    If the file contains raw scores (type = "scores"), PCA without rotation
-#'    will be performed on the data before running ClusterCirc.
 #'
 #' @param file File to be used for the analysis.
-#' @param type Fill in "scores" if the file contains raw scores of variables,
-#'    "loadings" if the file contains loadings from PCA or EFA.
-#'    Default is "scores".
+#' @param n_sample Sample size.
+#' @param input Type of input to be inserted into ClusterCirc. Options are "PCA"
+#'    (default), "Browne", "loadings", or "angles". "PCA" or "Browne" can be used
+#'    if the file contains raw scores of the variables to obtain item angles from
+#'    trigonometric transformation of two unrotated components (PCA) or from
+#'    CIRCUM analysis (Browne). Insert "loadings" if the file contains loadings
+#'    on two orthogonal axes from PCA or EFA or "angles" if it contains item angles.
 #' @param p Number of clusters (minimum = 2).
-#' @param m Number of variables.
-#' @param w_com Is "TRUE" if communalities of the variables are used as weights.
-#'    Is "FALSE" if user-defined weights should be used. Default = "TRUE".
+#' @param n_var Number of variables.
+#' @param w_com Is TRUE if communalities of the variables are used as weights.
+#'    Is FALSE if user-defined weights should be used. Default = TRUE.
 #' @param w Vector with weights for the variables. Weights need to be in the same
 #'    order as the variables in the data. Default = item communalities.
+#' @param e_def Is TRUE if default values for cluster weights (importance of
+#'    within-cluster proximity versus between-cluster spacing) are used.
+#' @param e Cluster weight (0 <= e <= 1) defining the importance of within-cluster
+#'    proximity versus equal cluster spacing. Default is 1/p weighing all clusters
+#'    equally. e = 0: Maximum importance of between-cluster spacing, within-cluster
+#'    proximity is ignored. e = 1: Maximum importance of within-cluster proximity,
+#'    between-cluster spacing is ignored.
+#' @param comm Vector with item communalities. Needs to be specified only if "input"
+#'    is "angles". Otherwise, the argument is ignored, and item communalities are
+#'    computed by the procedure.
 #' @param q Precision index for the algorithm. Precision is higher for larger
 #'   values. Default = 10. Must be an integer > 0.
 #'
 #' @return Returns item clusters with optimal circumplexity and ClusterCirc
 #'   coefficients: Overall ClusterCirc results, coefficients for clusters and for items.
+#'
 #' @export
 #'
-#' @examples cc_data(file = data_ex, type = "scores", p = 3, m = 18, w_com = "TRUE", w, q = 10)
-#'
-cc_data <- function(file, type = "scores", p, m, w_com = "TRUE", w, q = 10) {
+#' @examples cc_data(file = data_ex, n_sample = 300, input = "PCA", p = 3,
+#'   n_var = 18, w_com = TRUE, w, comm, e_def = TRUE, e, q = 10)
 
-  if (type == "scores") {
+cc_data <- function(file, n_sample, input = "PCA", p, n_var, w_com = TRUE, w,
+                    e_def = TRUE, e, comm, q = 10) {
+
+  if (input == "angles") {
+    angles <- file
+    comm <- comm
+    cat("\n ClusterCirc is based on user-inserted item angles.")
+  }
+
+  if (input == "loadings") {
+    cc_input <- cc_loadings(A = file, m = n_var)
+    angles <- cc_input[[1]]
+    comm <- cc_input[[2]]
+    cat("\n Item angles are estimated by trigonometric transformation of")
+    cat("\n user-inserted loadings on two components (circumplex axes).")
+  }
+
+  if (input == "PCA") {
     fit <- psych::principal(file, nfactors = 2, rotate = "none")
     fit[["loadings"]]
     A <- loadings(fit)
     class(A) <- "matrix"
+
+    cc_input <- cc_loadings(A, m = n_var)
+    angles <- cc_input[[1]]
+    comm <- cc_input[[2]]
+    cat("\n Item angles are estimated by trigonometric transformation of PCA")
+    cat("\n loadings on two unrotated orthogonal components (circumplex axes).")
   }
 
-  if (type == "loadings") {
-    A <- file
+  if (input == "Browne") {
+
+    R_c <-as.matrix(round(cor(file),2))
+    colnames(R_c) <- NULL
+    rownames(R_c) <- NULL
+    R_c[lower.tri(R_c)] <-0
+    R_rd <- round(R_c,2)
+    lmm = 10
+
+    cc_browne <- tryCatch({
+      circe_modfast(R_rd, v.names = seq(to = n_var), m = 1, N = n_sample, r = 1,
+                    equal.com = FALSE, equal.ang = FALSE, mcsc = "unconstrained",
+                    start.values = "PFA", file
+      )
+    }, error = function(msg) {
+      return(matrix(NA, nrow = n_var * 3 + 1, ncol = 2))
+    })
+
+    if (any(is.na(cc_browne)) == TRUE) {
+      cc_browne <- tryCatch({
+        circe_det001(R_rd, v.names = seq(to = n_var), m = 1, N = n_sample, r = 1,
+                     equal.com = FALSE, equal.ang = FALSE, mcsc = "unconstrained",
+                     start.values = "PFA", file
+        )
+      }, error = function(msg) {
+        return(matrix(NA, nrow = n_var * 3 + 1, ncol = 2))
+      })
+    }
+
+    angles <- cc_browne[1:n_var,1]
+    comm <- cc_browne[(n_var*2+2):(n_var*3+1),1]
+
+    cat("\n Item angles are estimated by Browne's procedure: CIRCUM")
   }
 
-  cc_results <- cc_raw(A, p, m, w_com, w, q)
+  if (e_def == TRUE) {
+    e <- 1/p
+  }
+
+  if (w_com == TRUE) {
+    w <- comm
+  }
+
+  cc_results <- cc_raw(angles, comm, p, m = n_var, w, e, q)
 
   overall <- cc_results[[1]]
   clusters <- cc_results[[2]]
   items <- cc_results[[3]]
   for_cc_simu <- cc_results[[4]]
+
+  for_cc_simu <- cbind(for_cc_simu, n_sample)
 
   as.data.frame(overall)
   colnames(overall) = c(
@@ -76,8 +152,9 @@ cc_data <- function(file, type = "scores", p, m, w_com = "TRUE", w, q = 10) {
   cc_items <<- items
   for_cc_simu <<- for_cc_simu
 
+  cat("\n")
   cat("\n ==============================")
-  cat("\n RESULTS CLUSTERCIRC-DATA ")
+  cat("\n RESULTS CLUSTERCIRC-DATA")
   cat("\n ==============================", "\n")
 
   cat("\n OVERALL")

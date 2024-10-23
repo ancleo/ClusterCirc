@@ -1,24 +1,26 @@
 Package: ClusterCirc
 Title: Finding item clusters for circumplex instruments
-Version: 0.0.0.2
+Version: 0.0.0.9000
 Authors@R: 
     person("an", "cleo", , "persoenlichkeitsmix@gmx.de", 
     role = c("aut", "cre"),
     comment = c(ORCID = "0000-0002-6593-5742"))
 Description: ClusterCirc analyzes data with circular structure and finds item 
     clusters with optimal circumplex spacing. ClusterCirc is based on item
-    loadings on factors or components, which are translated into angles in a 
-    circular arrangement. ClusterCirc can sort items into clusters that yield
-    optimal circumplex spacing. Optimal circumplex spacing for item clusters is
-    given if clusters are evenly distributed across the circle (equal spacing
-    between clusters) and if items are clustered closely around their cluster 
-    centroid (minimal within-cluster spacing/item heterogeneity). Spacing 
-    coefficients are computed to assess circumplex spacing (0 = optimal circumplexity).
+    angles, either computed from loadings on two orthogonal circumplex axes (e.g.
+    from PCA - default - or EFA) or as obtained from Browne's CIRCUM analysis.
+    ClusterCirc can sort items into clusters that yield optimal circumplex spacing. 
+    Optimal circumplex spacing for item clusters is given if clusters are evenly 
+    distributed across the circle (equal spacing between clusters) and if items 
+    are clustered closely around their cluster centroid (minimal within-cluster 
+    spacing/item heterogeneity). Spacing coefficients are computed to assess 
+    circumplex spacing (0 = optimal circumplexity).
     There are three main functions.
     1. cc_data sorts items into clusters with optimal circumplex spacing.
-    2. cc_simu creates samples from a population with perfect circumplex
-    spacing of clusters and the specifications of the data to compare with
-    the spacing coefficients from cc_data.
+    2. cc_simu can be used to assess circumplex model fit of the data by simulating
+    data with perfect circumplex spacing of clusters in the population and computing
+    ClusterCirc coefficients as reference values against which cc_data results
+    are compared.
     3. cc_fix does not sort items into clusters. Instead, it computes ClusterCirc
     coefficients for user-defined item clusters, which can be compared to results
     for item clusters as suggested by cc_data.

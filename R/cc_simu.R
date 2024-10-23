@@ -3,17 +3,20 @@
 #' @description Simulates data with perfect circumplex clusters in the population
 #'    using parameters from the empirical data (sample size, number of clusters,
 #'    number of items, empirical within-cluster range, mean item communality).
-#'    Performs ClusterCirc on the simulated data for comparison with results
-#'    from ClusterCirc-Data. Choose item communalities (default in cc_data) as
-#'    weights for variables in cc_data for adequate comparison.
-#'    Number of simulated samples: 500.
+#'    Performs ClusterCirc on the simulated data to assess circumplex model fit
+#'    of the data (results from cc_data). Choose item communalities
+#'    (default in cc_data) as weights for variables in cc_data for adequate comparison.
 #'
-#' @param n = Number of subjects in the sample.
-#' @param samples = Number of samples for the simulation. Default = 500.
+#' @param samples Number of samples for the simulation. Default = 500.
 #'    Decrease number of samples for faster computation. Recommended minimum = 100.
-#' @param alpha = Type-I error in percent for significance testing of deviation
+#' @param alpha Type-I error in percent for significance testing of deviation
 #'    from perfect circumplexity in the data. Options: 0.1, 1, 5, 10, 15, 20, 25.
 #'    Default = 1 (%).
+#' @param input Type of input in cc_data. Options are "PCA" (default),
+#'    "Browne", "loadings", or "angles". Choose the same option as in cc_data.
+#'    If input is "PCA", "loadings", or "angles", the simulation study uses angles
+#'    based on PCA in cc_simu. If input is "Browne", the simulation study uses
+#'    item angles based on Browne's procedure CIRCUM.
 #'
 #' @return Returns ClusterCirc coefficients for the population data and results for
 #'    simulated samples (mean, SD, min, max). Empirical 'spacing (weighted with h²)'
@@ -25,9 +28,9 @@
 #'
 #' @export
 #'
-#' @examples cc_simu(n = 300, samples = 500, alpha = 1)
+#' @examples cc_simu(samples = 100, alpha = 1, input = "PCA")
 
-cc_simu <- function(n, samples = 500, alpha = 1) {
+cc_simu <- function(samples = 500, alpha = 1, input = "PCA") {
 
   cc_data_done <- exists("for_cc_simu")
 
@@ -38,10 +41,13 @@ cc_simu <- function(n, samples = 500, alpha = 1) {
 
     p <- for_cc_simu[1]
     m <- for_cc_simu[2]
+    n_var <- m
     q <- for_cc_simu[3]
     h_sq <- for_cc_simu[4]
     h <- sqrt(rep(h_sq, m))
     c_wrange <- rep(for_cc_simu[5], p)
+    e <- for_cc_simu[6]
+    n <- for_cc_simu[7]
     n_simu <- samples
     n_pop <- n_simu * n
     mf <- m + 2
@@ -174,21 +180,72 @@ cc_simu <- function(n, samples = 500, alpha = 1) {
 
     var <- F %*% t(A) + U %*% t(D)
 
-    # ------------------------------
-    # --- PCA ON POPULATION DATA ---
-    # ------------------------------
+    if (input == "PCA" | input == "angles" | input == "loadings") {
 
-    fit <- psych::principal(var, nfactors = 2, rotate = "none")
-    fit[["loadings"]]
-    A_pop <- loadings(fit)
-    class(A_pop) <- "matrix"
-    A_pop
+      # ------------------------------
+      # --- PCA ON POPULATION DATA ---
+      # ------------------------------
+
+      fit <- psych::principal(var, nfactors = 2, rotate = "none")
+      fit[["loadings"]]
+      A_pop <- loadings(fit)
+      class(A_pop) <- "matrix"
+      A_pop
+
+      # compute angles from PCA
+
+      cc_input <- cc_loadings(A_pop, m = n_var)
+      angles_p <- cc_input[[1]]
+      comm_p <- cc_input[[2]]
+      w <- comm_p
+
+    }
+
+    if (input == "Browne") {
+
+      # ----------------------------------
+      # --- CIRCUM ON POPULATION DATA ---
+      # ----------------------------------
+
+      R_c <-as.matrix(round(cor(var),2))
+      colnames(R_c) <- NULL
+      rownames(R_c) <- NULL
+      R_c[lower.tri(R_c)] <-0
+      R_rd <- round(R_c,2)
+      lmm = 10
+
+      pop_browne <- tryCatch({
+        circe_modfast(R_rd, v.names = seq(to = n_var), m = 1, N = n, r = 1,
+                      equal.com = FALSE, equal.ang = FALSE, mcsc = "unconstrained",
+                      start.values = "PFA", file
+        )
+      }, error = function(msg) {
+        return(matrix(NA, nrow = n_var * 3 + 1, ncol = 2))
+      })
+
+      if (any(is.na(pop_browne)) == TRUE) {
+        pop_browne <- tryCatch({
+          circe_det001(R_rd, v.names = seq(to = n_var), m = 1, N = n, r = 1,
+                       equal.com = FALSE, equal.ang = FALSE, mcsc = "unconstrained",
+                       start.values = "PFA", file
+          )
+        }, error = function(msg) {
+          return(matrix(NA, nrow = n_var * 3 + 1, ncol = 2))
+        })
+      }
+
+      angles_p <- pop_browne[1:n_var,1]
+      comm_p <- pop_browne[(n_var*2+2):(n_var*3+1),1]
+      w <- comm_p
+
+      cat("\n Item angles are estimated by Browne's procedure: CIRCUM")
+    }
 
     # -------------------------------------------
-    # --- CLUSTERCIRC ON POPULATION LOADINGS ---
+    # --- CLUSTERCIRC ON POPULATION DATA ---
     # -------------------------------------------
 
-    cc_pop <- cc_raw(A_pop, p, m, w_com = "TRUE", w, q)
+    cc_pop <- cc_raw(angles_p, comm_p, p, m = n_var, w, e, q)
 
     overall_pop <- cc_pop[[1]]
     clusters_pop <- cc_pop[[2]]
@@ -276,25 +333,103 @@ cc_simu <- function(n, samples = 500, alpha = 1) {
       "Distance to cluster center"
     )
 
-    # --------------------------------
-    # --- PCA ON SIMULATED SAMPLES ---
-    # --------------------------------
+    if (input == "PCA" | input == "angles" | input == "loadings") {
 
-    A_samp <- matrix(0, nrow = n_simu * m, ncol = 2)
+      # ---------------------------------
+      # --- PCA ON SIMULATED SAMPLES ---
+      # ---------------------------------
+
+      A_samp <- matrix(0, nrow = n_simu * m, ncol = 2)
+
+      for (i_simu in 1:n_simu) {
+        var_s <- var[((i_simu - 1) * n + 1):(i_simu * n), ]
+        fit <- psych::principal(var_s, nfactors = 2, rotate = "none")
+        fit[["loadings"]]
+        A_s <- loadings(fit)
+        class(A_s) <- "matrix"
+        A_s
+
+        # compute angles from PCA
+
+        cc_input <- cc_loadings(A_s, m)
+        angles_s <- cc_input[[1]]
+        comm_s <- cc_input[[2]]
+
+        if (i_simu == 1) {
+          angles_all <- angles_s
+          comm_all <- comm_s
+        }
+
+        if (i_simu > 1) {
+          angles_all <- rbind(angles_all, angles_s)
+          comm_all <- rbind(comm_all, comm_s)
+        }
+
+      }
+      w_all <- comm_all
+    }
+
+    if (input == "Browne") {
+
+      # -----------------------------------
+      # --- CIRCUM ON SIMULATED SAMPLES ---
+      # -----------------------------------
+
+      for (i_simu in 1:n_simu) {
+        var_s <- var[((i_simu - 1) * n + 1):(i_simu * n), ]
+        R_c <-as.matrix(round(cor(var_s),2))
+        colnames(R_c) <- NULL
+        rownames(R_c) <- NULL
+        R_c[lower.tri(R_c)] <-0
+        R_rd <- round(R_c,2)
+        lmm = 10
+
+        s_browne <- tryCatch({
+          circe_modfast(R_rd, v.names = seq(to = n_var), m = 1, N = n, r = 1,
+                        equal.com = FALSE, equal.ang = FALSE, mcsc = "unconstrained",
+                        start.values = "PFA", file
+          )
+        }, error = function(msg) {
+          return(matrix(NA, nrow = n_var * 3 + 1, ncol = 2))
+        })
+
+        if (any(is.na(s_browne)) == TRUE) {
+          s_browne <- tryCatch({
+            circe_det001(R_rd, v.names = seq(to = n_var), m = 1, N = n, r = 1,
+                         equal.com = FALSE, equal.ang = FALSE, mcsc = "unconstrained",
+                         start.values = "PFA", file
+            )
+          }, error = function(msg) {
+            return(matrix(NA, nrow = n_var * 3 + 1, ncol = 2))
+          })
+        }
+
+        angles_s <- s_browne[1:n_var,1]
+        comm_s <- s_browne[(n_var*2+2):(n_var*3+1),1]
+
+        if (i_simu == 1) {
+          angles_all <- angles_s
+          comm_all <- comm_s
+        }
+        if (i_simu > 1) {
+          angles_all <- rbind(angles_all, angles_s)
+          comm_all <- rbind(comm_all, comm_s)
+        }
+
+      }
+      w_all <- comm_all
+    }
+
+    # -------------------------------
+    # --- CLUSTERCIRC ON SAMPLES ---
+    # -------------------------------
 
     for (i_simu in 1:n_simu) {
-      var_s <- var[((i_simu - 1) * n + 1):(i_simu * n), ]
-      fit <- psych::principal(var_s, nfactors = 2, rotate = "none")
-      fit[["loadings"]]
-      A_s <- loadings(fit)
-      class(A_s) <- "matrix"
-      A_s
+      angles_s <- angles_all[i_simu, ]
+      comm_s <- comm_all[i_simu, ]
+      w_s <- w_all[i_simu,]
 
-      # -------------------------------
-      # --- CLUSTERCIRC ON SAMPLES ---
-      # -------------------------------
-
-      cc_s <- cc_raw(A_s, p, m, w_com = "TRUE", w, q)
+      cc_s <- cc_raw(angles_s, comm_s, p, m, w_s, e, q)
 
       overall_s <- cc_s[[1]]
       clusters_s <- cc_s[[2]]
@@ -358,7 +493,6 @@ cc_simu <- function(n, samples = 500, alpha = 1) {
         ovrl_all <- rbind(ovrl_all, overall_s)
         sort_all <- rbind(sort_all, sortcorr)
       }
-
     }
 
     mean_simu <- colMeans(ovrl_all)
@@ -367,9 +501,7 @@ cc_simu <- function(n, samples = 500, alpha = 1) {
     max_simu <- apply(ovrl_all, 2, max)
 
     overall_simu <- rbind(mean_simu, sd_simu, min_simu, max_simu)
-
     accuracy <- sum(sort_all) / n_simu * 100
-
     simu_par <- matrix(c(n_simu, n, m, p, q), nrow = 1, ncol = 5)
 
     as.data.frame(overall_simu)
@@ -441,6 +573,7 @@ cc_simu <- function(n, samples = 500, alpha = 1) {
 
     cat("\n")
     cat("ITEMS - POPULATION")
+
     print(knitr::kable(items_pop, "simple", digits = 3))
 
     if (sortcorr_pop == 1) {
@@ -524,3 +657,4 @@ cc_simu <- function(n, samples = 500, alpha = 1) {
   }
 
 }
+

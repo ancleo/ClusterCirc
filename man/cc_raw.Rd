@@ -4,20 +4,25 @@
 \alias{cc_raw}
 \title{ClusterCirc: Raw algorithm}
 \usage{
-cc_raw(A, p, m, w_com, w, q)
+cc_raw(angles, comm, p, m, w, e, q)
 }
 \arguments{
-\item{A}{Loading matrix to perform ClusterCirc on.}
+\item{angles}{Item angles to perform ClusterCirc on.}
+
+\item{comm}{Item communalities.}
 
 \item{p}{Number of clusters.}
 
 \item{m}{Number of variables.}
 
-\item{w_com}{Is "TRUE" if communalities of the variables are used as weights.
-Is "FALSE" if user-defined weights should be used. Default = "TRUE".}
-
 \item{w}{Vector with weights for the variables. Weights need to be in the same
 order as the variables in the data. Default = item communalities.}
+
+\item{e}{Cluster weight (0 <= e <= 1) defining the importance of within-cluster
+proximity versus equal cluster spacing. Default is 1/p weighing all clusters
+equally. e = 0: Maximum importance of between-cluster spacing, within-cluster
+proximity is ignored. e = 1: Maximum importance of within-cluster proximity,
+between-cluster spacing is ignored.}
 
 \item{q}{Precision index for the algorithm. Precision is higher for larger
 values. Default = 10.}
@@ -31,7 +36,4 @@ Is a help function that performs the ClusterCirc search algorithm
 within ClusterCirc-Data (cc_data) and ClusterCirc-Simu (cc_simu).
 All of the arguments are taken from cc_data or cc_simu. cc_raw cannot be
 performed on its own.
-}
-\examples{
-cc_raw(A, p = 3, m = 18, w_com = "TRUE", w, q = 10)
 }

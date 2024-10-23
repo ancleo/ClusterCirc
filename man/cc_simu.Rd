@@ -4,17 +4,21 @@
 \alias{cc_simu}
 \title{ClusterCirc-Simu}
 \usage{
-cc_simu(n, samples = 500, alpha = 1)
+cc_simu(samples = 500, alpha = 1, input = "PCA")
 }
 \arguments{
-\item{n}{= Number of subjects in the sample.}
-
-\item{samples}{= Number of samples for the simulation. Default = 500.
+\item{samples}{Number of samples for the simulation. Default = 500.
 Decrease number of samples for faster computation. Recommended minimum = 100.}
 
-\item{alpha}{= Type-I error in percent for significance testing of deviation
+\item{alpha}{Type-I error in percent for significance testing of deviation
 from perfect circumplexity in the data. Options: 0.1, 1, 5, 10, 15, 20, 25.
 Default = 1 (\%).}
+
+\item{input}{Type of input in cc_data. Options are "PCA" (default),
+"Browne", "loadings", or "angles". Choose the same option as in cc_data.
+If input is "PCA", "loadings", or "angles", the simulation study uses angles
+based on PCA in cc_simu. If input is "Browne", the simulation study uses
+item angles based on Browne's procedure CIRCUM.}
 }
 \value{
 Returns ClusterCirc coefficients for the population data and results for
@@ -29,11 +33,10 @@ level (one-tailed significance test). The empirical z-value is also given.
 Simulates data with perfect circumplex clusters in the population
 using parameters from the empirical data (sample size, number of clusters,
 number of items, empirical within-cluster range, mean item communality).
-Performs ClusterCirc on the simulated data for comparison with results
-from ClusterCirc-Data. Choose item communalities (default in cc_data) as
-weights for variables in cc_data for adequate comparison.
-Number of simulated samples: 500.
+Performs ClusterCirc on the simulated data to assess circumplex model fit
+of the data (results from cc_data). Choose item communalities
+(default in cc_data) as weights for variables in cc_data for adequate comparison.
 }
 \examples{
-cc_simu(n = 300, samples = 500, alpha = 1)
+cc_simu(samples = 100, alpha = 1, input = "PCA")
 }

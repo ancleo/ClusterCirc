@@ -60,24 +60,20 @@ structure. It can be used to find item clusters with optimal circumplex
 spacing as an alternative to other clustering techniques like
 conventional cluster analysis.
 
-ClusterCirc can be applied to raw data or on item loadings on two
-orthogonal factors or components from principal component analysis,
-exploratory or confirmatory factor analysis. If ClusterCirc is used on
-raw data, principal component analysis is performed before ClusterCirc
-to yield loadings on two unrotated components.
+ClusterCirc is based on item angles. Input data can be item angles directly,
+raw data, or item  loadings on two orthogonal factors or components from 
+principal component analysis, exploratory or confirmatory factor analysis. 
+If the data file contains raw data, item angles can be obtained by performing 
+PCA (default) and converting the resulting loadings on two unrotated components 
+into angles or by performing Browne's procedure CIRCUM on the data. 
 
-The ClusterCirc algorithm uses item loadings and translates them into
-angles in a circular arrangement by trigonometric conversion.
 ClusterCirc then sorts items into clusters that yield optimal circumplex
-spacing.
-
-Optimal circumplex spacing for item clusters is given if clusters are
+spacing. Optimal circumplex spacing for item clusters is given if clusters are
 evenly distributed across the circle (equal spacing between clusters)
 and if items are clustered closely around their cluster centroid
 (minimal within-cluster spacing/item heterogeneity). Spacing coefficients 
-are computed to assess circumplex spacing of items, clusters, and the 
-overall data. Range of all ClusterCirc coefficients: 0-1 (0 = perfect 
-circumplex spacing).
+are computed to assess circumplex spacing of items, clusters, and the overall data.
+Range of all ClusterCirc coefficients: 0-1 (0 = perfect circumplex spacing).
 
 ### There are three functions for users:
 
@@ -88,11 +84,12 @@ circumplex spacing).
     which is included in the ClusterCirc package and automatically
     performed when cc_data is called.
 
-    Usage on exemplary data with 3 clusters (p), 18 variables (m), items weighted 
-	by communalities (w_com = "TRUE", w), default precision index (q = 10):        
-    **cc_data(file = data_ex, type = "scores", p = 3, m = 18, w_com = "TRUE", w, q = 10)**
+    Usage on exemplary data with 3 clusters (p), 18 variables (n_var), items
+    weighted by communalities (w_com = "TRUE", w), default precision index (q = 10):        
+    **cc_data(file = data_ex, n_sample = 300, input = "PCA", p = 3,
+        n_var = 18, w_com = TRUE, w, comm, e_def = TRUE, e, q = 10)**
 
-2.  **cc_simu:**  
+3.  **cc_simu:**  
     Can be used to assess circumplex fit of the dataset.
     The function uses the specifications of the data and creates samples
     from a population with perfect circumplex spacing of clusters (default
@@ -102,16 +99,17 @@ circumplex spacing).
     cc_data.
 	
 	Usage for exemplary data (300 subjects in data):       
-    **cc_simu(n = 300, samples = 500, alpha = 1)** 
+    **cc_simu(samples = 500, alpha = 1, input = "PCA")** 
 	
-3.  **cc_fix:** Computes ClusterCirc coefficients for user-defined item clusters
+4.  **cc_fix:** Computes ClusterCirc coefficients for user-defined item clusters
     without performing the ClusterCirc search algorithm to find item clusters.
     ClusterCirc-fix coefficients for user-defined item clusters can be compared
     to ClusterCirc coefficients for item clusters found by ClusterCirc-Data.
 	
 	Usage on exemplary data with Cluster1 = items 1 to 6, Cluster2 = items 7 to 10,
 	Cluster3 = items 11 to 18 (limits):
-    **cc_fix(data_ex, type = "scores", limits = c(6,10,18), p = 3, m = 18, w_com = "TRUE", w)** 
+    **cc_fix(file = data_ex, n_sample= 300, input = "PCA", limits = c(6,10,18),
+       p = 3, n_var = 18, w_com = TRUE, comm, w, e_def = TRUE, e)** 
 
 See function documentation in R for more detailed description and usage of functions:  
 **?cc_data**    

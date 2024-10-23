@@ -2,30 +2,59 @@
 % Please edit documentation in R/cc_fix.R
 \name{cc_fix}
 \alias{cc_fix}
-\title{ClusterCirc-fix}
+\title{ClusterCirc-Fix}
 \usage{
-cc_fix(file, type = "scores", limits, p, m, w_com = "TRUE", w)
+cc_fix(
+  file,
+  n_sample,
+  input = "PCA",
+  limits,
+  p,
+  n_var,
+  w_com = TRUE,
+  w,
+  e_def = TRUE,
+  e,
+  comm
+)
 }
 \arguments{
 \item{file}{File to be used for the analysis.}
 
-\item{type}{Is "scores" if the file contains raw scores of variables,
-"loadings" if the file contains loadings from PCA or EFA.
-Default is "scores".}
+\item{n_sample}{Sample size.}
 
-\item{limits}{Vector with the positions of the last item of each cluster,
-e.g. c(6,10,18) for 3 clusters with C1 = i1-i6, C2 = i7-i10, C3 = i11-i18.}
+\item{input}{Type of input to be inserted into ClusterCirc. Options are "PCA"
+(default), "Browne", "loadings", or "angles". "PCA" or "Browne" can be used
+if the file contains raw scores of the variables to obtain item angles from
+trigonometric transformation of two unrotated components (PCA) or from
+CIRCUM analysis (Browne). Insert "loadings" if the file contains loadings
+on two orthogonal axes from PCA or EFA or "angles" if it contains item angles.}
 
-\item{p}{Number of clusters.}
+\item{limits}{Vector with the positions of the last item of each cluster.}
 
-\item{m}{Number of variables.}
+\item{p}{Number of clusters (minimum = 2).}
 
-\item{w_com}{Is "TRUE" if communalities of the variables are used as weights.
-Is "FALSE" if user-defined weights should be used. Default = "TRUE".}
+\item{n_var}{Number of variables.}
+
+\item{w_com}{Is TRUE if communalities of the variables are used as weights.
+Is FALSE if user-defined weights should be used. Default = TRUE.}
 
 \item{w}{Vector with weights for the variables. Weights need to be in the same
 order as the variables in the data and should be the same weights as used in
 cc_data for fair comparison of spc_w. Default = item communalities.}
+
+\item{e_def}{Is TRUE if default values for cluster weights (importance of
+within-cluster proximity versus between-cluster spacing) are used.}
+
+\item{e}{Cluster weight (0 <= e <= 1) defining the importance of within-cluster
+proximity versus equal cluster spacing. Default is 1/p weighing all clusters
+equally. e = 0: Maximum importance of between-cluster spacing, within-cluster
+proximity is ignored. e = 1: Maximum importance of within-cluster proximity,
+between-cluster spacing is ignored.}
+
+\item{comm}{Vector with item communalities. Needs to be specified only if "input"
+is "angles". Otherwise, the argument is ignored, and item communalities are
+computed by the procedure.}
 }
 \value{
 cc_fix returns overall ClusterCirc coefficients for user-defined item
@@ -37,9 +66,10 @@ suggested by cc_data.
 Computes ClusterCirc coefficients for user-defined item
 clusters. Items need to be sorted in the data file before analysis,
 e.g. cluster 1 = items 1 to 6, cluster 2 = items 7 to 10, etc.
-ClusterCirc-fix coefficients for user-defined item clusters can be compared
+ClusterCirc-Fix coefficients for user-defined item clusters can be compared
 to ClusterCirc coefficients for item clusters found by ClusterCirc-Data.
 }
 \examples{
-cc_fix(data_ex, type = "scores", limits = c(6,10,18), p = 3, m = 18, w_com = "TRUE", w)
+cc_fix(file = data_ex, n_sample= 300, input = "PCA", limits = c(6,10,18),
+   p = 3, n_var = 18, w_com = TRUE, comm, w, e_def = TRUE, e)
 }
