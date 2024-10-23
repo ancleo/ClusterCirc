@@ -45,7 +45,7 @@ cc_simu <- function(samples = 500, alpha = 1, input = "PCA") {
     q <- for_cc_simu[3]
     h_sq <- for_cc_simu[4]
     h <- sqrt(rep(h_sq, m))
-    c_wrange <- rep(for_cc_simu[5], p)
+    c_wrange <- for_cc_simu[5]
     e <- for_cc_simu[6]
     n <- for_cc_simu[7]
     n_simu <- samples
@@ -100,7 +100,7 @@ cc_simu <- function(samples = 500, alpha = 1, input = "PCA") {
 
     cl_dis <- 360 / p
     ones <- rep(1, p)
-    w_dis <- c_wrange %/% (mc - ones)
+    w_dis <- c_wrange/(mc-1)
 
     for (c in 1:p) {
       th <- rep(mc[c], 0)
@@ -657,4 +657,3 @@ cc_simu <- function(samples = 500, alpha = 1, input = "PCA") {
   }
 
 }
-

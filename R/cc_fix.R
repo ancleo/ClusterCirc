@@ -169,32 +169,32 @@ cc_fix <- function(file, n_sample, input = "PCA", limits, p, n_var, w_com = TRUE
       c_rng[c] <- c_max[c] - c_min[c]
     }
 
-  }
+    # Special case: Cluster at approx. 0° could have a range of > 180.
+    # Change item angles with help objects.
 
-  # Special case: Cluster at approx. 0° could have a range of > 180.
-  # Change item angles with help objects.
+    if (c_max[c] - c_min[c] > 180) {
+      theta_h <- theta
+      c_minh <- 361
+      c_maxh <- 0
 
-  if (c_max[c] - c_min[c] > 180) {
-    theta_h <- theta
-    c_minh <- 361
-    c_maxh <- 0
+      for (i in 1:m) {
+        if (theta[i] > 180) {
+          theta_h[i] <- theta[i] - 360
+        }
+        if (ci_v[i] == c & theta_h[i] <= c_minh) {
+          c_minh <- theta_h[i]
+        }
+        if (ci_v[i] == c & theta_h[i] >= c_maxh) {
+          c_maxh <- theta_h[i]
+        }
+      }
 
-    for (i in 1:m) {
-      if (theta[i] > 180) {
-        theta_h[i] <- theta[i] - 360
-      }
-      if (ci_v[i] == c & theta_h[i] <= c_minh) {
-        c_minh <- theta_h[i]
-      }
-      if (ci_v[i] == c & theta_h[i] >= c_maxh) {
-        c_maxh <- theta_h[i]
-      }
+      c_max[c] <- c_maxh
+      c_min[c] <- 360 + c_minh
+      c_rng[c] <- c_maxh - c_minh
+      c_ang[c] <- (c_minh + c_maxh) / 2
     }
 
-    c_max[c] <- c_maxh
-    c_min[c] <- 360 + c_minh
-    c_rng[c] <- c_maxh - c_minh
-    c_ang[c] <- (c_minh + c_maxh) / 2
   }
 
   # Clusters and items need to be sorted before computing spacing indices
@@ -440,5 +440,3 @@ cc_fix <- function(file, n_sample, input = "PCA", limits, p, n_var, w_com = TRUE
   cat ("https://psyarxiv.com/yf37w/")
 
 }
-
-
